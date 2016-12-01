@@ -10,6 +10,10 @@ module Gestalt
       freeze
     end
 
+    def == other
+      super || self.class.dependencies.all? { |dep| public_send(dep) == other.public_send(dep) }
+    end
+
     private
 
     def _validate fields

@@ -25,4 +25,13 @@ RSpec.describe Gestalt::Struct do
     chain = pipe n, ->(x) { x.reverse }
     expect(chain.call "asdf racecar").to eq "racecar fdsa 1 _"
   end
+
+  it "can check for equality" do
+    h = ->{ }
+    n = rand  1 .. 10
+    m = rand 11 .. 20
+
+    expect(Fixtures::Numberizer.new http: h, number: n).to     eq Fixtures::Numberizer.new http: h, number: n
+    expect(Fixtures::Numberizer.new http: h, number: n).not_to eq Fixtures::Numberizer.new http: h, number: m
+  end
 end
