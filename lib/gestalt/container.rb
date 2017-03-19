@@ -54,6 +54,15 @@ module Gestalt
       end
     end
 
+    def method_missing name, *args
+      return super if args.any?
+      if block_given?
+        register(name) { yield }
+      else
+        resolve(name)
+      end
+    end
+
     private
 
     attr_reader :constructors, :instances
