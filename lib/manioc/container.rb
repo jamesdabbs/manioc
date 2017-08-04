@@ -28,9 +28,13 @@ module Manioc
     def with &block
       self.class.new \
         constructors: @constructors.dup,
-        cache:        @cache.any?,
+        cache:        !@cache.nil?,
         preload:      @preload,
         &block
+    end
+
+    def clone
+      with
     end
 
     def reset key=nil

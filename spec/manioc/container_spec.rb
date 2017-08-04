@@ -57,4 +57,11 @@ RSpec.describe Manioc::Container do
     old = uncached.now
     expect(uncached.now).to be > old
   end
+
+  it 'can clone' do
+    clone = container.clone
+    first  = clone.now
+    second = container.now
+    expect(second).to be > first
+  end
 end
