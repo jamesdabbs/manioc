@@ -3,15 +3,17 @@ require 'spec_helper'
 use 'container'
 
 RSpec.describe Manioc::Container do
+  let(:config) { proc {
+    error { raise 'nope'}
+    count { rand 1 .. 1_000 }
+    now   { Time.now }
+    a     { 1 }
+    b     { a * 2 }
+    c     { b * 3 }
+  } }
+
   let(:container) {
-    Manioc::Container.new do
-      error { raise 'nope'}
-      count { rand 1 .. 1_000 }
-      now   { Time.now }
-      a     { 1 }
-      b     { a * 2 }
-      c     { b * 3 }
-    end
+    Manioc::Container.new(&config)
   }
 
   it 'constructs lazily' do
@@ -44,5 +46,15 @@ RSpec.describe Manioc::Container do
 
     expect(container.b ).to eq 2
     expect(overridden.b).to eq 10
+  end
+
+  it 'can preload' do
+    expect { Manioc::Container.new preload: true, &config }.to raise_error 'nope'
+  end
+
+  it 'can disable caching' do
+    uncached = Manioc::Container.new cache: false, &config
+    old = uncached.now
+    expect(uncached.now).to be > old
   end
 end
