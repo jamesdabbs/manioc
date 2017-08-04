@@ -39,6 +39,12 @@ module Manioc
       keys.each { |k| @cache.delete k }
     end
 
+    def inspect
+      # :nocov:
+      %|<#{self.class.name}(#{@constructors.keys.join(', ')})>|
+      # :nocov:
+    end
+
     private
 
     def register &block
