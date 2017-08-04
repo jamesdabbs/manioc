@@ -6,7 +6,7 @@ SimpleCov.start do
 end
 
 def use path
-  require File.expand_path "../lib/gestalt/#{path}", __dir__
+  require File.expand_path "../lib/manioc/#{path}", __dir__
 end
 
 require 'pry'

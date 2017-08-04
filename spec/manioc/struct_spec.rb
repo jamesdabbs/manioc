@@ -2,9 +2,9 @@ require 'spec_helper'
 
 use 'struct'
 
-RSpec.describe Gestalt::Struct do
+RSpec.describe Manioc::Struct do
   context 'basic structs' do
-    class Basic < Gestalt[:foo]
+    class Basic < Manioc[:foo]
     end
 
     it 'creates frozen structs by default' do
@@ -38,7 +38,7 @@ RSpec.describe Gestalt::Struct do
   end
 
   context 'with defaults' do
-    class Defaults < Gestalt[:foo, bar: 2]
+    class Defaults < Manioc[:foo, bar: 2]
     end
 
     it 'can create structs with defaults' do
@@ -49,8 +49,8 @@ RSpec.describe Gestalt::Struct do
   end
 
   context 'unfreezing' do
-    before(:all) { Gestalt.frozen = false }
-    after(:all)  { Gestalt.frozen = true }
+    before(:all) { Manioc.frozen = false }
+    after(:all)  { Manioc.frozen = true }
 
     it 'creates stubbable objects' do
       b = Basic.new foo: ->{ raise 'not stubbed' }

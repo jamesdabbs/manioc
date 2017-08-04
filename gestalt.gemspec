@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'gestalt/version'
+require 'manioc/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "gestalt"
-  spec.version       = Gestalt::VERSION
+  spec.name          = "manioc"
+  spec.version       = Manioc::VERSION
   spec.authors       = ["James Dabbs"]
   spec.email         = ["jamesdabbs@gmail.com"]
 

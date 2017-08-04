@@ -2,9 +2,9 @@ require 'spec_helper'
 
 use 'container'
 
-RSpec.describe Gestalt::Container do
+RSpec.describe Manioc::Container do
   let(:container) {
-    Gestalt::Container.new do
+    Manioc::Container.new do
       error { raise 'nope'}
       count { rand 1 .. 1_000 }
       now   { Time.now }

@@ -1,4 +1,4 @@
-module Gestalt
+module Manioc
   class Container
     class DSL
       def initialize &block

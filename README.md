@@ -1,34 +1,27 @@
-# Gestalt
+# Manioc
 
-
-## Installation
-
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'gestalt'
-```
-
-## Usage
-
-Gestalt exposes two main utility classes: `Struct` and `Container`.
+Manioc exposes two main utility classes: `Struct` and `Container`.
 
 A struct is a simple stateless object with transparently inverted dependencies:
 
-```
-class Service < Gestalt[:http, :logger]
+```ruby
+class Service < Manioc[:http, :logger]
+  def call url
+    response = http.get url
+    logger.info "#{url}: #{response}"
+  end
 end
 
 real = Service.new(http: HTTP::Client.new, logger: Logger.new)
 fake = Service.new(http: double('http'), logger: double('logger'))
 
-[real, fake].sample.logger.info "..."
+[real, fake].sample.call('http://google.com')
 ```
 
 A container makes it easy to declare and customize the interdependencies between various structs:
 
-```
-dev = Gestalt::Container.new do
+```ruby
+dev = Manioc::Container.new do
   http          { HTTP::Client.new }
   logger        { Logger.new STDOUT }
   error_handler { ->(e) { logger.error e } }
@@ -43,6 +36,13 @@ prod = dev.with do
 end
 ```
 
+## Installation
+
+Add this line to your application's Gemfile:
+
+```ruby
+gem 'manioc'
+```
 
 ## Development
 
@@ -52,7 +52,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/gestalt. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/manioc. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 
 ## License
