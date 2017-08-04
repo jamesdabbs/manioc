@@ -4,12 +4,12 @@ use 'container'
 
 RSpec.describe Manioc::Container do
   let(:config) { proc {
-    error { raise 'nope'}
-    count { rand 1 .. 1_000 }
-    now   { Time.now }
-    a     { 1 }
-    b     { a * 2 }
-    c     { b * 3 }
+    error  { raise 'nope'}
+    count  { rand 1 .. 1_000 }
+    now    { Time.now }
+    a      { 1 }
+    b      { a * 2 }
+    c      { b * 3 }
   } }
 
   let(:container) {

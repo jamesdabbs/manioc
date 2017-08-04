@@ -42,6 +42,12 @@ module Manioc
       self.class.fields.each_with_object({}) { |field,h| h[field] = public_send field }
     end
 
+    def inspect
+      # :nocov:
+      %|<#{self.class.name}(#{self.class.fields.join(', ')})>|
+      # :nocov:
+    end
+
     private
 
     def _validate fields
