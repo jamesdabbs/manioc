@@ -1,6 +1,6 @@
-require 'gestalt/container'
-require 'gestalt/struct'
-require 'gestalt/version'
+require 'manioc/container'
+require 'manioc/struct'
+require 'manioc/version'
 
-module Gestalt
+module Manioc
 end

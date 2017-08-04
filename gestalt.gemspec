@@ -1,17 +1,17 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'gestalt/version'
+require 'manioc/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "gestalt"
-  spec.version       = Gestalt::VERSION
+  spec.name          = "manioc"
+  spec.version       = Manioc::VERSION
   spec.authors       = ["James Dabbs"]
   spec.email         = ["jamesdabbs@gmail.com"]
 
   spec.summary       = "Quick-and-dirty functional service objects"
   spec.description   = spec.summary
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.homepage      = "https://github.com/jamesdabbs/manioc"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }

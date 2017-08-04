@@ -1,4 +1,4 @@
-module Gestalt
+module Manioc
   class << self
     def [] *fields, **defaults
       fields = (fields + defaults.keys).uniq
@@ -27,7 +27,7 @@ module Gestalt
       fields = self.class.defaults.merge fields
       _validate fields
       _assign   fields
-      freeze if Gestalt.frozen?
+      freeze if Manioc.frozen?
     end
 
     def == other
