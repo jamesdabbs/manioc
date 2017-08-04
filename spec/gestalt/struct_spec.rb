@@ -1,37 +1,61 @@
-require "spec_helper"
+require 'spec_helper'
+
+use 'struct'
 
 RSpec.describe Gestalt::Struct do
-  def pipe *fs
-    ->(val) { fs.reduce(val) { |acc,f| f.call acc } }
+  context 'basic structs' do
+    class Basic < Gestalt[:foo]
+    end
+
+    it 'creates frozen structs by default' do
+      b = Basic.new foo: 1
+      expect(b.foo).to eq 1
+      expect(b).to be_frozen
+    end
+
+    it 'can check equality' do
+      a1 = Basic.new foo: :a
+      a2 = Basic.new foo: :a
+      b  = Basic.new foo: :b
+      expect(a1).to eq a2
+      expect(a2).not_to eq b
+    end
+
+    it 'requires fields on initialization' do
+      expect { Basic.new }.to raise_error(KeyError, /foo/)
+    end
+
+    it 'validates fields on initialization' do
+      expect { Basic.new foo: 1, bar: 2 }.to raise_error(KeyError, /bar/)
+    end
+
+    it 'updates by copying' do
+      a = Basic.new foo: :a
+      b = a.with foo: :b
+      expect(b.foo).to eq :b
+      expect(a.foo).to eq :a
+    end
   end
 
-  it "verifies fields are present" do
-    expect { Fixtures::Stringulator.new }.to raise_error KeyError, /string/
+  context 'with defaults' do
+    class Defaults < Gestalt[:foo, bar: 2]
+    end
+
+    it 'can create structs with defaults' do
+      d = Defaults.new foo: 1
+      expect(d.foo).to eq 1
+      expect(d.bar).to eq 2
+    end
   end
 
-  it "verifies fields are defined" do
-    expect { Fixtures::Stringulator.new string: "foo", extra: 5 }.to \
-      raise_error KeyError, /extra/
-  end
+  context 'unfreezing' do
+    before(:all) { Gestalt.frozen = false }
+    after(:all)  { Gestalt.frozen = true }
 
-  let(:n) { Fixtures::Numberizer.new http: ->{ "_" }, number: 1 }
-
-  it "is composable with other structs" do
-    chain = pipe n, n, n
-    expect(chain.call "test").to eq "_ 1 _ 1 _ 1 test"
-  end
-
-  it "is composable with procs" do
-    chain = pipe n, ->(x) { x.reverse }
-    expect(chain.call "asdf racecar").to eq "racecar fdsa 1 _"
-  end
-
-  it "can check for equality" do
-    h = ->{ }
-    n = rand  1 .. 10
-    m = rand 11 .. 20
-
-    expect(Fixtures::Numberizer.new http: h, number: n).to     eq Fixtures::Numberizer.new http: h, number: n
-    expect(Fixtures::Numberizer.new http: h, number: n).not_to eq Fixtures::Numberizer.new http: h, number: m
+    it 'creates stubbable objects' do
+      b = Basic.new foo: ->{ raise 'not stubbed' }
+      expect(b).to receive(:foo).and_return ->{ 2 }
+      expect(b.foo.call).to eq 2
+    end
   end
 end

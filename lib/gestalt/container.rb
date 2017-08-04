@@ -1,70 +1,52 @@
 module Gestalt
   class Container
-    NotRegistered = Class.new StandardError
+    class DSL
+      def initialize &block
+        @fields = {}
+        instance_exec(&block)
+      end
 
-    def initialize
-      @constructors, @instances = Concurrent::Hash.new, Concurrent::Hash.new
-      yield self if block_given?
-      @constructors.freeze
-    end
+      def to_h
+        @fields
+      end
 
-    def register key, &block
-      constructors[key] = block
-    end
-
-    def build klass, key_map={}
-      Builder.new klass, key_map
-    end
-
-    def construct key, **overrides
-      cons = constructors[key]
-      return unless cons
-      res = instance_exec(&cons)
-      if res.is_a? Builder
-        res.call self, overrides
-      elsif res.is_a?(Class) && res < Gestalt::Struct
-        Builder.new(res).call self, overrides
-      else
-        res
+      def method_missing name, *args, &block
+        return super if args.any?
+        @fields[name] = block
       end
     end
 
-    def [] key
-      instances[key] ||= construct(key)
+    def initialize **constructors, &block
+      @constructors, @instances = constructors, {}
+
+      register(&block) if block
+      finalize
     end
 
-    def resolve key
-      self[key] || raise(NotRegistered, "`#{key}` not registered")
+    def with &block
+      self.class.new @constructors.dup, &block
     end
 
-    def reset *keys
-      if keys.any?
-        keys.each { |key| instances.delete key }
-      else
-        instances.clear
-      end
-    end
-
-    def with &overrides
-      self.class.new do |c|
-        constructors.each { |key, cons| c.register(key, &cons) }
-        # TODO: it's too easy to accidentally "override" using the wrong name, in which case
-        #   the old value still gets used silently
-        overrides.call c
-      end
-    end
-
-    def method_missing name, *args
-      return super if args.any?
-      if block_given?
-        register(name) { yield }
-      else
-        resolve(name)
-      end
+    def reset key=nil
+      keys = key ? [key] : @instances.keys
+      keys.each { |k| @instances.delete k }
     end
 
     private
 
-    attr_reader :constructors, :instances
+    def register &block
+      @constructors.merge! DSL.new(&block).to_h
+    end
+
+    def resolve key
+      @instances[key] ||= instance_exec(&@constructors[key])
+    end
+
+    def finalize
+      @constructors.freeze
+      @constructors.each do |key,_|
+        define_singleton_method(key) { resolve key }
+      end
+    end
   end
 end

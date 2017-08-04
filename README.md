@@ -1,8 +1,5 @@
 # Gestalt
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/gestalt`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
 
 ## Installation
 
@@ -12,17 +9,40 @@ Add this line to your application's Gemfile:
 gem 'gestalt'
 ```
 
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install gestalt
-
 ## Usage
 
-TODO: Write usage instructions here
+Gestalt exposes two main utility classes: `Struct` and `Container`.
+
+A struct is a simple stateless object with transparently inverted dependencies:
+
+```
+class Service < Gestalt[:http, :logger]
+end
+
+real = Service.new(http: HTTP::Client.new, logger: Logger.new)
+fake = Service.new(http: double('http'), logger: double('logger'))
+
+[real, fake].sample.logger.info "..."
+```
+
+A container makes it easy to declare and customize the interdependencies between various structs:
+
+```
+dev = Gestalt::Container.new do
+  http          { HTTP::Client.new }
+  logger        { Logger.new STDOUT }
+  error_handler { ->(e) { logger.error e } }
+end
+
+test = dev.with do
+  http { instance_double HTTP::Client }
+end
+
+prod = dev.with do
+  error_handler { ->(e) { Rollbar.error e } }
+end
+```
+
 
 ## Development
 

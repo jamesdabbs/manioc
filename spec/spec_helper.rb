@@ -1,14 +1,15 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
-require 'rspec/coverage'
-RSpec::Coverage.start do
+require 'simplecov'
+SimpleCov.start do
   add_filter '/spec/'
 end
 
-require 'gestalt'
-require 'pry'
+def use path
+  require File.expand_path "../lib/gestalt/#{path}", __dir__
+end
 
-require_relative './fixtures'
+require 'pry'
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
