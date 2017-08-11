@@ -26,13 +26,13 @@ RSpec.describe Manioc::Container do
 
   it 'can reset individual values' do
     old = container.now
-    container.reset :now
+    container.reset! :now
     expect(container.now).to be > old
   end
 
   it 'can reset all values' do
     old = container.now
-    container.reset
+    container.reset!
     expect(container.now).to be > old
   end
 
@@ -49,13 +49,7 @@ RSpec.describe Manioc::Container do
   end
 
   it 'can preload' do
-    expect { Manioc::Container.new preload: true, &config }.to raise_error 'nope'
-  end
-
-  it 'can disable caching' do
-    uncached = Manioc::Container.new cache: false, &config
-    old = uncached.now
-    expect(uncached.now).to be > old
+    expect { Manioc::Container.new(&config).preload! }.to raise_error 'nope'
   end
 
   it 'can clone' do

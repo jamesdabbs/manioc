@@ -1,6 +1,6 @@
 module Manioc
   class Container
-    class DSL
+    class DSL < BasicObject
       def initialize &block
         @fields = {}
         instance_exec(&block)
@@ -16,31 +16,28 @@ module Manioc
       end
     end
 
-    def initialize cache: true, preload: false, constructors: {}, &block
-      @constructors = constructors
-      @cache        = cache ? {} : nil
-      @preload      = preload
+    def initialize constructors: {}, &block
+      @constructors, @cache = constructors, {}
 
       register(&block) if block
       finalize
     end
 
     def with &block
-      self.class.new \
-        constructors: @constructors.dup,
-        cache:        !@cache.nil?,
-        preload:      @preload,
-        &block
+      self.class.new constructors: @constructors.dup, &block
     end
 
     def clone
       with
     end
 
-    def reset key=nil
-      return unless @cache
-      keys = key ? [key] : @cache.keys
+    def reset! *keys
+      keys = @cache.keys if keys.empty?
       keys.each { |k| @cache.delete k }
+    end
+
+    def preload!
+      @constructors.keys.each { |key| resolve key }
     end
 
     def inspect
@@ -56,21 +53,13 @@ module Manioc
     end
 
     def resolve key
-      instance_exec(&@constructors[key])
+      @cache[key] ||= instance_exec(&@constructors[key])
     end
 
     def finalize
       @constructors.freeze
-      @constructors.each do |key,_|
-        if @cache
-          define_singleton_method(key) { @cache[key] ||= resolve key }
-        else
-          define_singleton_method(key) { resolve key }
-        end
-
-        if @preload
-          public_send key
-        end
+      @constructors.keys.each do |key|
+        define_singleton_method(key) { resolve key }
       end
     end
   end

@@ -36,6 +36,32 @@ prod = dev.with do
 end
 ```
 
+### Rails
+
+Manioc includes a few convenience methods for the conventional use case of a Rails application with one container, customized per-environment:
+
+```ruby 
+# config/application.rb
+module MyApp
+  class Applicaton
+    container do
+      foo { 0 }
+      bar { foo + 1 }
+    end
+  end
+end
+
+# config/environments/test.rb
+Rails.application.configure do
+  container do
+    foo { 1000 }
+  end
+end
+
+# in e.g. a spec file
+Rails.configuration.container.bar # => 1001
+```
+
 ## Installation
 
 Add this line to your application's Gemfile:
