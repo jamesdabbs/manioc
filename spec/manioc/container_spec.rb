@@ -58,4 +58,27 @@ RSpec.describe Manioc::Container do
     second = container.now
     expect(second).to be > first
   end
+
+  context 'environment variables' do
+    let(:container) {
+      Manioc::Container.new do
+        a { env.A }
+        b { env.B! }
+      end
+    }
+
+    around :each do |ex|
+      ENV['A'] = 'a'
+      ex.call
+      ENV['A'] = nil
+    end
+
+    it 'can read environment variables' do
+      expect(container.a).to eq 'a'
+    end
+
+    it 'errors if required variables are unset' do
+      expect { container.b }.to raise_error(Manioc::Env::Unset, 'B')
+    end
+  end
 end

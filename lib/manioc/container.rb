@@ -1,3 +1,5 @@
+require_relative './env'
+
 module Manioc
   class Container
     class DSL < BasicObject
@@ -18,6 +20,8 @@ module Manioc
 
     def initialize constructors: {}, &block
       @constructors, @cache = constructors, {}
+
+      @constructors[:env] ||= Manioc::Env.method(:new)
 
       register(&block) if block
       finalize
