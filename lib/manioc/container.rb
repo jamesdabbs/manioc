@@ -27,8 +27,8 @@ module Manioc
       finalize
     end
 
-    def with &block
-      self.class.new constructors: @constructors.dup, &block
+    def with constructors={}, &block
+      self.class.new constructors: @constructors.merge(constructors), &block
     end
 
     def clone

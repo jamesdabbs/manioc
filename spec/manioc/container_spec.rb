@@ -48,6 +48,12 @@ RSpec.describe Manioc::Container do
     expect(overridden.b).to eq 10
   end
 
+  it 'can override values without the DSL' do
+    overridden = container.with b: ->{ 50 }
+    expect(overridden.b).to eq 50
+    expect(overridden.c).to eq 150
+  end
+
   it 'can preload' do
     expect { Manioc::Container.new(&config).preload! }.to raise_error 'nope'
   end
