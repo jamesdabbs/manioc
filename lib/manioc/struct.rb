@@ -7,27 +7,37 @@ module Manioc
         define_singleton_method(:fields  ) { fields }
         define_singleton_method(:defaults) { defaults }
 
+        define_singleton_method(:frozen?) { true }
+
         fields.each do |field|
           attr_reader field
         end
       end
     end
 
-    def frozen= val
-      @frozen = val
-    end
-    def frozen?
-      @frozen
+    def mutable *fields, **defaults
+      klass = self[*fields, **defaults]
+      klass.instance_exec do
+        (fields + defaults.keys).uniq.each do |field|
+          attr_writer field
+        end
+
+        define_singleton_method(:frozen?) { false }
+      end
+      klass
     end
   end
-  self.frozen = true
 
   class Struct
+    class << self
+      attr_accessor :frozen
+    end
+
     def initialize **fields
       fields = self.class.defaults.merge fields
       _validate fields
       _assign   fields
-      freeze if Manioc.frozen?
+      freeze if self.class.frozen?
     end
 
     def == other

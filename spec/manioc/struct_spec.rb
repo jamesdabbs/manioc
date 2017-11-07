@@ -48,14 +48,16 @@ RSpec.describe Manioc::Struct do
     end
   end
 
-  context 'unfreezing' do
-    before(:all) { Manioc.frozen = false }
-    after(:all)  { Manioc.frozen = true }
+  context 'mutability' do
+    let(:klass) { Manioc.mutable(:a, b: 2) }
 
-    it 'creates stubbable objects' do
-      b = Basic.new foo: ->{ raise 'not stubbed' }
-      expect(b).to receive(:foo).and_return ->{ 2 }
-      expect(b.foo.call).to eq 2
+    it 'creates mutable objects' do
+      object = klass.new a: 1
+      expect(object.a).to eq 1
+      expect(object.b).to eq 2
+
+      object.b = 5
+      expect(object.b).to eq 5
     end
   end
 end
