@@ -1,6 +1,7 @@
 module Manioc
   class Rails::Application
-    def self.container &setup
+    def self.container frozen: true, &setup
+      Manioc.frozen = frozen
       if setup
         config.container = config.container.with(&setup)
       else
@@ -8,8 +9,8 @@ module Manioc
       end
     end
 
-    def container &setup
-      self.class.container(&setup)
+    def container **opts, &setup
+      self.class.container(**opts, &setup)
     end
   end
 
