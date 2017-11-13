@@ -70,7 +70,7 @@ module Manioc
 
     def inspect
       # :nocov:
-      %|<#{self.class.name}(#{self.class.fields.join(', ')})>|
+      %|<#{self.class.name}(#{self.class.config.fields.join(', ')})>|
       # :nocov:
     end
 
